@@ -28,14 +28,24 @@ function App() {
 
   // Music Setup
   const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
+    const name = "Babe";
+    window.history.replaceState(null, "", `?to=${name}`);
+  }, []);
+
+  const playMusic = () => {
     if (audioRef.current) {
       audioRef.current.volume = 0.4;
-      audioRef.current.play();
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((err) => console.log("Autoplay blocked:", err));
     }
-  }, [isPlaying]);
+  };
 
   const toggleMusic = () => {
     if (audioRef.current) {
@@ -47,10 +57,6 @@ function App() {
       setIsPlaying(!isPlaying);
     }
   };
-  useEffect(() => {
-    const name = "Babe";
-    window.history.replaceState(null, "", `?to=${name}`);
-  }, []);
 
   const toggleLang = () => {
     setLang(lang === "english" ? "pidgin" : "english");
@@ -78,7 +84,10 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center overflow-hidden justify-center h-screen bg-pink-100 text-center p-4">
+    <div
+      className="flex flex-col items-center overflow-hidden justify-center h-screen bg-pink-100 text-center p-4"
+      onClick={playMusic} // Ensures music plays on user interaction
+    >
       <audio ref={audioRef} loop>
         <source src="/music.mp3" type="audio/mp3" />
       </audio>
@@ -106,7 +115,7 @@ function App() {
               {lang === "english" ? "Yes" : "Yes na"}
             </motion.button>
             <motion.button
-              className={` bg-red-500 text-white rounded-lg text-lg absolute transition-all duration-100 ${
+              className={`bg-red-500 text-white rounded-lg text-lg absolute transition-all duration-100 ${
                 lang === "english" ? "px-6 py-2" : "px-2 py-2"
               }`}
               onClick={handleNoClick}
