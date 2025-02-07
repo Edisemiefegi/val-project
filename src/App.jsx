@@ -103,7 +103,7 @@ function App() {
               {lang === "english" ? "Yes" : "Yes na"}
             </motion.button>
             <motion.button
-              className={` bg-red-500 text-white rounded-lg text-lg absolute transition-all duration-300 ${
+              className={` bg-red-500 text-white rounded-lg text-lg absolute transition-all duration-100 ${
                 lang === "english" ? "px-6 py-2" : "px-2 py-2"
               }`}
               onClick={handleNoClick}
