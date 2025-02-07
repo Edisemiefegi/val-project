@@ -24,7 +24,7 @@ function App() {
   const [noClicks, setNoClicks] = useState(0);
   const [accepted, setAccepted] = useState(false);
   const [yesSize, setYesSize] = useState(1);
-  const [noPosition, setNoPosition] = useState(0);
+  const [noPosition, setNoPosition] = useState({ x: 100, y: 0 }); // Start away from "Yes"
 
   const toggleLang = () => {
     setLang(lang === "english" ? "pidgin" : "english");
@@ -33,7 +33,15 @@ function App() {
   const handleNoClick = () => {
     setNoClicks(noClicks + 1);
     setYesSize(yesSize + 0.2);
-    setNoPosition(noPosition + 50);
+
+    // Generate random movement while keeping the button inside a safe range
+    const randomX = (Math.random() - 0.5) * 300; // Moves left/right
+    const randomY = (Math.random() - 0.5) * 200; // Moves up/down
+
+    setNoPosition((prev) => ({
+      x: Math.max(-150, Math.min(150, prev.x + randomX)),
+      y: Math.max(-100, Math.min(100, prev.y + randomY)),
+    }));
   };
 
   const handleYesClick = () => {
@@ -41,13 +49,13 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center  overflow-hidden justify-center h-screen bg-pink-100 text-center p-4">
+    <div className="flex flex-col items-center overflow-hidden justify-center h-screen bg-pink-100 text-center p-4">
       {accepted && <FloatingHearts />}
 
       {!accepted ? (
         <>
           <motion.img
-            src="/cute-hearts.gif"
+            src="/val.gif"
             alt="Happy Gif"
             className="w-48 h-48 mb-4"
             animate={{ scale: [1, 1.1, 1] }}
@@ -56,7 +64,7 @@ function App() {
           <h1 className="text-3xl font-bold text-red-600 mb-4">
             {lang === "english" ? "Will you be my Val?" : "You go be my Val?"}
           </h1>
-          <div className="flex gap-4">
+          <div className="relative flex justify-center gap-4">
             <motion.button
               className="bg-green-500 cursor-pointer text-white px-6 py-2 rounded-lg text-lg"
               style={{ transform: `scale(${yesSize})` }}
@@ -65,10 +73,11 @@ function App() {
               {lang === "english" ? "Yes" : "Yes na"}
             </motion.button>
             <motion.button
-              className="bg-red-500 text-white px-6 py-2 rounded-lg text-lg"
+              className="bg-red-500 text-white px-6 py-2 rounded-lg text-lg absolute"
               onClick={handleNoClick}
-              animate={{ x: noPosition }}
+              animate={{ x: noPosition.x, y: noPosition.y }}
               transition={{ type: "spring", stiffness: 100 }}
+              initial={{ x: 120 }} // Ensure it starts away from "Yes"
             >
               {lang === "english" ? "No" : "Mbok no"}
             </motion.button>
