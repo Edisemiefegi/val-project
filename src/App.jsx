@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import FloatingHearts from "./FloatingHearts";
 import { motion } from "framer-motion";
 
@@ -24,24 +24,50 @@ function App() {
   const [noClicks, setNoClicks] = useState(0);
   const [accepted, setAccepted] = useState(false);
   const [yesSize, setYesSize] = useState(1);
-  const [noPosition, setNoPosition] = useState({ x: 100, y: 0 }); // Start away from "Yes"
+  const [noPosition, setNoPosition] = useState({ x: 100, y: 0 });
+
+  // Music Setup
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.4;
+      audioRef.current.play();
+    }
+  }, []);
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   const toggleLang = () => {
     setLang(lang === "english" ? "pidgin" : "english");
+    setNoPosition({ x: 100, y: 0 }); // Reset "No" position
   };
 
   const handleNoClick = () => {
     setNoClicks(noClicks + 1);
     setYesSize(yesSize + 0.2);
 
-    // Generate random movement while keeping the button inside a safe range
-    const randomX = (Math.random() - 0.5) * 300; // Moves left/right
-    const randomY = (Math.random() - 0.5) * 200; // Moves up/down
+    // Moves further away
+    const directionX = Math.random() > 0.5 ? 1 : -1;
+    const directionY = Math.random() > 0.5 ? 1 : -1;
 
-    setNoPosition((prev) => ({
-      x: Math.max(-150, Math.min(150, prev.x + randomX)),
-      y: Math.max(-100, Math.min(100, prev.y + randomY)),
-    }));
+    const newX = noPosition.x + directionX * (50 + Math.random() * 50);
+    const newY = noPosition.y + directionY * (30 + Math.random() * 50);
+
+    setNoPosition({
+      x: Math.min(200, Math.max(-200, newX)),
+      y: Math.min(150, Math.max(-150, newY)),
+    });
   };
 
   const handleYesClick = () => {
@@ -50,6 +76,10 @@ function App() {
 
   return (
     <div className="flex flex-col items-center overflow-hidden justify-center h-screen bg-pink-100 text-center p-4">
+      <audio ref={audioRef} loop>
+        <source src="/music.mp3" type="audio/mp3" />
+      </audio>
+
       {accepted && <FloatingHearts />}
 
       {!accepted ? (
@@ -73,11 +103,13 @@ function App() {
               {lang === "english" ? "Yes" : "Yes na"}
             </motion.button>
             <motion.button
-              className="bg-red-500 text-white px-6 py-2 rounded-lg text-lg absolute"
+              className={` bg-red-500 text-white rounded-lg text-lg absolute transition-all duration-300 ${
+                lang === "english" ? "px-6 py-2" : "px-2 py-2"
+              }`}
               onClick={handleNoClick}
               animate={{ x: noPosition.x, y: noPosition.y }}
               transition={{ type: "spring", stiffness: 100 }}
-              initial={{ x: 120 }} // Ensure it starts away from "Yes"
+              initial={{ x: 120 }}
             >
               {lang === "english" ? "No" : "Mbok no"}
             </motion.button>
@@ -104,11 +136,19 @@ function App() {
           </h1>
         </>
       )}
+
       <button
         onClick={toggleLang}
         className="absolute top-4 right-4 bg-red-500 rounded-full p-2 text-white"
       >
         {lang === "english" ? "Switch to Pidgin" : "Switch to English"}
+      </button>
+
+      <button
+        onClick={toggleMusic}
+        className="absolute top-4 left-4 bg-blue-500 rounded-full p-2 text-white"
+      >
+        {isPlaying ? "Pause Music" : "Play Music"}
       </button>
     </div>
   );
