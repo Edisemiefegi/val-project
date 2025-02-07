@@ -25,15 +25,13 @@ function App() {
   const [accepted, setAccepted] = useState(false);
   const [yesSize, setYesSize] = useState(1);
   const [noPosition, setNoPosition] = useState({ x: 100, y: 0 });
+  // const [name, setName] = useState("");
 
-  // Music Setup
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    const name = "Babe";
-    window.history.replaceState(null, "", `?to=${name}`);
-  }, []);
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("to") || "";
 
   const playMusic = () => {
     if (audioRef.current) {
@@ -47,14 +45,21 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    playMusic();
+    window.history.replaceState(null, "", `?to=${name}`);
+    console.log(name, "namemm");
+  }, []);
+
   const toggleMusic = () => {
+    setIsPlaying(!isPlaying);
+
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
         audioRef.current.play();
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -84,27 +89,19 @@ function App() {
   };
 
   return (
-    <div
-      className="flex flex-col items-center overflow-hidden justify-center h-screen bg-pink-100 text-center p-4"
-      onClick={playMusic} // Ensures music plays on user interaction
-    >
-      <audio ref={audioRef} loop>
+    <div className="flex flex-col items-center overflow-hidden justify-center h-screen bg-pink-100 text-center p-4">
+      <audio onClick={playMusic} ref={audioRef} loop>
         <source src="/music.mp3" type="audio/mp3" />
       </audio>
-
       {accepted && <FloatingHearts />}
 
       {!accepted ? (
         <>
-          <motion.img
-            src="/val.gif"
-            alt="Happy Gif"
-            className="w-48 h-48 mb-4"
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ repeat: Infinity, duration: 1 }}
-          />
+          <img src="/val.gif" alt="Happy Gif" className="w-48 h-48 mb-4" />
           <h1 className="text-3xl font-bold text-red-600 mb-4">
-            {lang === "english" ? "Will you be my Val?" : "You go be my Val?"}
+            {lang === "english"
+              ? `Will you be my Val? ${name}`
+              : `You go be my Val? ${name}`}
           </h1>
           <div className="relative flex justify-center gap-4">
             <motion.button
@@ -134,12 +131,10 @@ function App() {
         </>
       ) : (
         <>
-          <motion.img
+          <img
             src="/pic2.webp"
             alt="Very Happy Gif"
             className="w-48 h-48 mb-4"
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 0.8 }}
           />
           <h1 className="text-3xl font-bold text-red-600 mb-4">
             {lang === "english"
