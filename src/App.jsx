@@ -35,7 +35,7 @@ function App() {
       audioRef.current.volume = 0.4;
       audioRef.current.play();
     }
-  }, []);
+  }, [isPlaying]);
 
   const toggleMusic = () => {
     if (audioRef.current) {
@@ -47,17 +47,20 @@ function App() {
       setIsPlaying(!isPlaying);
     }
   };
+  useEffect(() => {
+    const name = "Babe";
+    window.history.replaceState(null, "", `?to=${name}`);
+  }, []);
 
   const toggleLang = () => {
     setLang(lang === "english" ? "pidgin" : "english");
-    setNoPosition({ x: 100, y: 0 }); // Reset "No" position
+    setNoPosition({ x: 100, y: 0 });
   };
 
   const handleNoClick = () => {
     setNoClicks(noClicks + 1);
     setYesSize(yesSize + 0.2);
 
-    // Moves further away
     const directionX = Math.random() > 0.5 ? 1 : -1;
     const directionY = Math.random() > 0.5 ? 1 : -1;
 
