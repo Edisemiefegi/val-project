@@ -91,7 +91,7 @@ function App() {
       ) : (
         <>
           <motion.img
-            src="/pic.gif"
+            src="/pic2.webp"
             alt="Very Happy Gif"
             className="w-48 h-48 mb-4"
             animate={{ rotate: [0, 10, -10, 0] }}
